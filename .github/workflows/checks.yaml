@@ -1,0 +1,25 @@
+name: Verify dist
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-dist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build with Rollup
+        run: npm run build
+
+      - name: Check for changes in dist
+        run: |
+          git diff --exit-code dist || \
+          (echo "❌ dist is not up to date. Run 'npm run build' and commit changes." && exit 1)
